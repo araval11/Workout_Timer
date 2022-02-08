@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:workout_timer_ui/workout_timer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,17 +18,18 @@ class MyApp extends StatelessWidget {
   }
 }
 
+int timer = seconds;
+int minutes = 0;
+int seconds = 3;
+int rest = 5;
+int duration = 1;
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int minutes = 0;
-  int seconds = 30;
-  int rest = 15;
-  int duration = 1;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,7 +125,15 @@ class _HomePageState extends State<HomePage> {
                                                     IconButton(
                                                       onPressed: () {
                                                         setModalState(() {
-                                                          if (seconds > 20) {
+                                                          if (minutes > 0 &&
+                                                              seconds == 0) {
+                                                            minutes -= 1;
+                                                            seconds = 60;
+                                                          } else if (minutes >
+                                                              0) {
+                                                            seconds -= 5;
+                                                          } else if (seconds >
+                                                              20) {
                                                             seconds -= 5;
                                                           }
                                                         });
@@ -180,7 +190,9 @@ class _HomePageState extends State<HomePage> {
                                                     IconButton(
                                                       onPressed: () {
                                                         setModalState(() {
-                                                          rest -= 5;
+                                                          if (rest > 15) {
+                                                            rest -= 5;
+                                                          }
                                                         });
                                                       },
                                                       icon: Icon(CupertinoIcons
@@ -226,7 +238,9 @@ class _HomePageState extends State<HomePage> {
                                                     IconButton(
                                                       onPressed: () {
                                                         setModalState(() {
-                                                          duration--;
+                                                          if (duration > 1) {
+                                                            duration--;
+                                                          }
                                                         });
                                                       },
                                                       icon: Icon(CupertinoIcons
@@ -263,13 +277,10 @@ class _HomePageState extends State<HomePage> {
                                                   width: 150.0,
                                                   child: ElevatedButton(
                                                       onPressed: () {
-                                                        Navigator.push(context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                          return HomePage();
-                                                        }));
+                                                        setState(() {
+                                                          Navigator.pop(
+                                                              context);
+                                                        });
                                                       },
                                                       child: Text(
                                                         'Done',
@@ -309,16 +320,21 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     Container(
+                      height: 50.0,
                       width: 200.0,
                       child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(
                                 builder: (BuildContext context) {
-                              return HomePage();
+                              return WorkoutTimer(
+                                exercise: seconds,
+                                sets: duration,
+                                rest: rest,
+                              );
                             }));
                           },
                           child: Text(
-                            'Start',
+                            'START',
                           )),
                     ),
                   ],
@@ -326,150 +342,6 @@ class _HomePageState extends State<HomePage> {
               )
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class WorkoutTimer extends StatefulWidget {
-  @override
-  State<WorkoutTimer> createState() => _WorkoutTimerState();
-}
-
-class _WorkoutTimerState extends State<WorkoutTimer> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: Center(
-            child: Text(
-              'Workout Timer',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Container(
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                                'https://i.pinimg.com/736x/5d/53/c5/5d53c5eaf981a2d10211eae217f924e1.jpg'),
-                            fit: BoxFit.fill,
-                          )),
-                      height: 50.0,
-                      width: 50.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Stay The Night',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            'Claptone',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 30.0,
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.blue),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            height: 45.0,
-                            width: 45.0,
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.pause,
-                                color: Colors.blue,
-                              ),
-                              onPressed: () {},
-                            )),
-                        SizedBox(
-                          width: 15.0,
-                        ),
-                        Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.blue),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            height: 45.0,
-                            width: 45.0,
-                            child: IconButton(
-                              iconSize: 30.0,
-                              icon: Icon(
-                                Icons.skip_next_outlined,
-                                color: Colors.blue,
-                              ),
-                              onPressed: () {},
-                            )),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Stack(children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 245.0, left: 95.0),
-                child: Text(
-                  'Rest!',
-                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 280.0, left: 95.0),
-                child: Text(
-                  'Set 1 of 8',
-                  style: TextStyle(
-                    fontSize: 15.0,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 80.0),
-                child: CircularCountDownTimer(
-                  width: 250.0,
-                  height: 250.0,
-                  duration: 10,
-                  fillColor: Color.fromARGB(255, 68, 255, 246),
-                  ringColor: Colors.blueGrey,
-                  strokeWidth: 15.0,
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 80.0),
-                ),
-              ),
-            ]),
-          ],
         ),
       ),
     );
