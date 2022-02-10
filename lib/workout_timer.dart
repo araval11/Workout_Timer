@@ -16,6 +16,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
   CountDownController _controller = CountDownController();
   bool isExercise = true;
   int sets = 0;
+  int finalsets = 0;
 
   @override
   void initState() {
@@ -134,7 +135,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
               Padding(
                 padding: const EdgeInsets.only(top: 280.0, left: 95.0),
                 child: Text(
-                  'Set 1 of ${widget.sets}',
+                  'Set ${sets} of ${widget.sets}',
                   style: TextStyle(
                     fontSize: 15.0,
                   ),
@@ -147,16 +148,20 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
                   height: 250.0,
                   controller: _controller,
                   onComplete: () {
-                    // print("DHRUMIL");
                     if (isExercise) {
-                      print('enter');
+                      _controller.restart(duration: widget.rest);
+                      //isExercise ? widget.exercise : widget.rest
                       isExercise = false;
-                      _controller.restart(
-                          duration: isExercise ? widget.exercise : widget.rest);
-                    } else {
-                      isExercise = true;
-                      sets = sets - 1;
+                    } else if (sets <= 0) {
                       _controller.pause();
+                    } else if (isExercise == false) {
+                      sets = sets - 1;
+                      print(sets);
+                      _controller.restart(duration: widget.exercise);
+                      isExercise = true;
+                      //print('completed 1');
+
+                      setState(() {});
                     }
                   },
                   duration: widget.exercise,
