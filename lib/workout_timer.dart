@@ -12,17 +12,19 @@ class WorkoutTimer extends StatefulWidget {
   State<WorkoutTimer> createState() => _WorkoutTimerState();
 }
 
-class _WorkoutTimerState extends State<WorkoutTimer> with TickerProviderStateMixin{
-  final AnimationController _controller = AnimationController(vsync: this,duration: Duration(seconds: 10),);
+class _WorkoutTimerState extends State<WorkoutTimer>
+    with TickerProviderStateMixin {
   bool isExercise = true;
   int sets = 0;
   int finalsets = 0;
   final two_pi = 3.14 * 2;
+  int duration_counter = 0;
 
   @override
   void initState() {
     super.initState();
     sets = widget.sets;
+    duration_counter = widget.exercise;
   }
 
   @override
@@ -127,6 +129,80 @@ class _WorkoutTimerState extends State<WorkoutTimer> with TickerProviderStateMix
             ),
             Stack(children: [
               Padding(
+                padding: const EdgeInsets.only(top: 80.0),
+                child: TweenAnimationBuilder(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: Duration(seconds: duration_counter),
+                  onEnd: () {
+                    print(duration_counter);
+                    if (isExercise) {
+                      setState(() {
+                        duration_counter = widget.rest;
+                      });
+                      //isExercise ? widget.exercise : widget.rest
+                      isExercise = false;
+                    } else if (isExercise == false) {
+                      sets = sets - 1;
+                      print(sets);
+                      setState(() {
+                        duration_counter = widget.exercise;
+                      });
+                      isExercise = true;
+                      //print('completed 1');
+
+                      setState(() {});
+                    }
+                  },
+                  builder: (context, double value, Widget? child) {
+                    double convert_seconds = (1 / duration_counter);
+                    int seconds_timer = (value ~/ convert_seconds).toInt();
+                    return Container(
+                      width: 250.0,
+                      height: 250.0,
+                      child: Stack(
+                        children: [
+                          ShaderMask(
+                            shaderCallback: (rect) {
+                              return SweepGradient(
+                                  startAngle: 0.0,
+                                  endAngle: two_pi,
+                                  stops: [value, value],
+                                  // 0.0 , 0.5 , 0.5 , 1.0
+                                  center: Alignment.center,
+                                  colors: [
+                                    Colors.blue,
+                                    Colors.grey.withAlpha(55)
+                                  ]).createShader(rect);
+                            },
+                            child: Container(
+                              width: 250.0,
+                              height: 250.0,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: Container(
+                              width: 250.0 - 40,
+                              height: 250.0 - 40,
+                              decoration: BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
+                              child: Center(
+                                  child: Text(
+                                "$seconds_timer",
+                                style: TextStyle(fontSize: 40),
+                              )),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.only(top: 245.0, left: 95.0),
                 child: Text(
                   'Rest!',
@@ -142,54 +218,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> with TickerProviderStateMix
                   ),
                 ),
               ),
-              AnimatedBuilder(
-            animation: _controller,
-            
-            builder: (BuildContext context,Widget? child){
-              
-              
-              return Container(
-                width: 250.0,
-                height: 250.0,
-                child: Stack(
-                  children: [
-                    ShaderMask(
-                      shaderCallback: (rect){
-                        return SweepGradient(
-                            startAngle: 0.0,
-                            endAngle: two_pi,
-                            stops: [0.0,1.0],
-                            // 0.0 , 0.5 , 0.5 , 1.0
-                            center: Alignment.center,
-                            colors: [Colors.blue,Colors.grey.withAlpha(55)]
-                        ).createShader(rect);
-                      },
-                      child: Container(
-                        width: 250.0,
-                        height: 250.0,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: Image.asset("assets/images/radial_scale.png").image)
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: Container(
-                        width: 250.0-40,
-                        height: 250.0-40,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle
-                        ),
-                        child: Center(child: Text("Hello",
-                          style: TextStyle(fontSize: 40),)),
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-          ),
+
               // Padding(
               //   padding: const EdgeInsets.only(top: 80.0),
               //   child: CircularCountDownTimer(
