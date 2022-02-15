@@ -12,11 +12,12 @@ class WorkoutTimer extends StatefulWidget {
   State<WorkoutTimer> createState() => _WorkoutTimerState();
 }
 
-class _WorkoutTimerState extends State<WorkoutTimer> {
-  CountDownController _controller = CountDownController();
+class _WorkoutTimerState extends State<WorkoutTimer> with TickerProviderStateMixin{
+  final AnimationController _controller = AnimationController(vsync: this,duration: Duration(seconds: 10),);
   bool isExercise = true;
   int sets = 0;
   int finalsets = 0;
+  final two_pi = 3.14 * 2;
 
   @override
   void initState() {
@@ -141,37 +142,85 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 80.0),
-                child: CircularCountDownTimer(
-                  width: 250.0,
-                  height: 250.0,
-                  controller: _controller,
-                  onComplete: () {
-                    if (isExercise) {
-                      _controller.restart(duration: widget.rest);
-                      //isExercise ? widget.exercise : widget.rest
-                      isExercise = false;
-                    } else if (sets <= 0) {
-                      _controller.pause();
-                    } else if (isExercise == false) {
-                      sets = sets - 1;
-                      print(sets);
-                      _controller.restart(duration: widget.exercise);
-                      isExercise = true;
-                      //print('completed 1');
-
-                      setState(() {});
-                    }
-                  },
-                  duration: widget.exercise,
-                  fillColor: Color.fromARGB(255, 68, 255, 246),
-                  ringColor: Colors.blueGrey,
-                  strokeWidth: 15.0,
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 80.0),
+              AnimatedBuilder(
+            animation: _controller,
+            
+            builder: (BuildContext context,Widget? child){
+              
+              
+              return Container(
+                width: 250.0,
+                height: 250.0,
+                child: Stack(
+                  children: [
+                    ShaderMask(
+                      shaderCallback: (rect){
+                        return SweepGradient(
+                            startAngle: 0.0,
+                            endAngle: two_pi,
+                            stops: [0.0,1.0],
+                            // 0.0 , 0.5 , 0.5 , 1.0
+                            center: Alignment.center,
+                            colors: [Colors.blue,Colors.grey.withAlpha(55)]
+                        ).createShader(rect);
+                      },
+                      child: Container(
+                        width: 250.0,
+                        height: 250.0,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(image: Image.asset("assets/images/radial_scale.png").image)
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                        width: 250.0-40,
+                        height: 250.0-40,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle
+                        ),
+                        child: Center(child: Text("Hello",
+                          style: TextStyle(fontSize: 40),)),
+                      ),
+                    )
+                  ],
                 ),
-              ),
+              );
+            },
+          ),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 80.0),
+              //   child: CircularCountDownTimer(
+              //     width: 250.0,
+              //     height: 250.0,
+              //     controller: _controller,
+              //     onComplete: () {
+              //       if (isExercise) {
+              //         _controller.restart(duration: widget.rest);
+              //         //isExercise ? widget.exercise : widget.rest
+              //         isExercise = false;
+              //       } else if (sets <= 0) {
+              //         _controller.pause();
+              //       } else if (isExercise == false) {
+              //         sets = sets - 1;
+              //         print(sets);
+              //         _controller.restart(duration: widget.exercise);
+              //         isExercise = true;
+              //         //print('completed 1');
+
+              //         setState(() {});
+              //       }
+              //     },
+              //     duration: widget.exercise,
+              //     fillColor: Color.fromARGB(255, 68, 255, 246),
+              //     ringColor: Colors.blueGrey,
+              //     strokeWidth: 15.0,
+              //     textStyle:
+              //         TextStyle(fontWeight: FontWeight.bold, fontSize: 80.0),
+              //   ),
+              // ),
             ]),
           ],
         ),
