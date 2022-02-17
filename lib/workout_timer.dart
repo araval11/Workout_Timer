@@ -1,4 +1,3 @@
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutTimer extends StatefulWidget {
@@ -19,12 +18,16 @@ class _WorkoutTimerState extends State<WorkoutTimer>
   int finalsets = 0;
   final two_pi = 3.14 * 2;
   int duration_counter = 0;
-
+  late AnimationController _controller;
   @override
   void initState() {
     super.initState();
     sets = widget.sets;
     duration_counter = widget.exercise;
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: duration_counter),
+    )..forward();
   }
 
   @override
@@ -130,32 +133,12 @@ class _WorkoutTimerState extends State<WorkoutTimer>
             Stack(children: [
               Padding(
                 padding: const EdgeInsets.only(top: 80.0),
-                child: TweenAnimationBuilder(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: Duration(seconds: duration_counter),
-                  onEnd: () {
-                    print(duration_counter);
-                    if (isExercise) {
-                      setState(() {
-                        duration_counter = widget.rest;
-                      });
-                      //isExercise ? widget.exercise : widget.rest
-                      isExercise = false;
-                    } else if (isExercise == false) {
-                      sets = sets - 1;
-                      print(sets);
-                      setState(() {
-                        duration_counter = widget.exercise;
-                      });
-                      isExercise = true;
-                      //print('completed 1');
-
-                      setState(() {});
-                    }
-                  },
-                  builder: (context, double value, Widget? child) {
+                child: AnimatedBuilder(
+                  animation: Tween(begin: 0.0, end: 1.0).animate(_controller),
+                  builder: (BuildContext context, Widget? child) {
                     double convert_seconds = (1 / duration_counter);
-                    int seconds_timer = (value ~/ convert_seconds).toInt();
+                    int seconds_timer =
+                        (_controller.value ~/ convert_seconds).toInt();
                     return Container(
                       width: 250.0,
                       height: 250.0,
@@ -166,7 +149,7 @@ class _WorkoutTimerState extends State<WorkoutTimer>
                               return SweepGradient(
                                   startAngle: 0.0,
                                   endAngle: two_pi,
-                                  stops: [value, value],
+                                  stops: [_controller.value, _controller.value],
                                   // 0.0 , 0.5 , 0.5 , 1.0
                                   center: Alignment.center,
                                   colors: [
@@ -218,8 +201,20 @@ class _WorkoutTimerState extends State<WorkoutTimer>
                   ),
                 ),
               ),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-              // Padding(
+
+
+
+
+
+// Padding(
               //   padding: const EdgeInsets.only(top: 80.0),
               //   child: CircularCountDownTimer(
               //     width: 250.0,
@@ -250,10 +245,3 @@ class _WorkoutTimerState extends State<WorkoutTimer>
               //         TextStyle(fontWeight: FontWeight.bold, fontSize: 80.0),
               //   ),
               // ),
-            ]),
-          ],
-        ),
-      ),
-    );
-  }
-}
